@@ -1,10 +1,13 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+const PORT = 3000;
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule)
-	app.setGlobalPrefix('api')
+	const app = await NestFactory.create(AppModule);
+	app.setGlobalPrefix('api');
 	//http://localhost:3000/api/
-	await app.listen(3000)
+	await app.listen(PORT);
+	console.log(`http://localhost:${PORT}/api/`);
 }
-bootstrap()
+bootstrap();
