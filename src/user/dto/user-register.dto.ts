@@ -1,5 +1,6 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 import { Field, InputType } from '@nestjs/graphql';
+import { IsStrongPassword } from './is-strong-password.decorator';
 
 @InputType()
 export class UserRegisterDTO {
@@ -13,6 +14,6 @@ export class UserRegisterDTO {
 
 	@Field()
 	@IsNotEmpty()
-	@MinLength(6)
+	@IsStrongPassword()
 	password: string;
 }
