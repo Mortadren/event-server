@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { UserRegisterDTO } from './dto/user-register.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -19,8 +20,14 @@ export class UserService {
 		if (existingUser) {
 			throw new ConflictException('Email already in use');
 		}
+		const hashedPassword = await bcrypt.hash(userData.password, 10);
+		// При авторизации проверка совпадения паролей через bcrypt.compare(pass1, pass2)
 
-		const newUser = this.userRepository.create(userData);
+		const newUser = this.userRepository.create({
+			...userData,
+			password: hashedPassword,
+		});
+
 		return this.userRepository.save(newUser);
 	}
 
