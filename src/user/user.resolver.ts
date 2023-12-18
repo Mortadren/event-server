@@ -1,25 +1,28 @@
-import { Resolver } from '@nestjs/graphql';
-import { UserService } from './user.service';
-import { Query } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UserRegisterDTO } from './dto/user-register.dto';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { UserService } from './user.service';
 
-//TODO: разобраться с резолвером, и обращениям к репе юзеререпозитори.
-@Resolver()
+@Resolver(() => User)
 export class UserResolver {
-	constructor(
-		@InjectRepository(User)
-		private readonly userService: UserService,
-	) {}
+	constructor(private readonly userService: UserService) {}
 
-	@Query(() => Array)
-	async name() {
+	@Query(() => Number)
+	async getUsersCount() {
+		return this.userService.getNum();
+	}
+
+	@Query(() => [User])
+	async getUsers() {
 		return this.userService.getAll();
 	}
 
-	@Query(() => Number)
-	async getNum() {
-		return this.userService.getNum();
+	@Mutation(() => User)
+	@UsePipes(new ValidationPipe({ whitelist: true }))
+	async register(
+		@Args('registerInput') registerInput: UserRegisterDTO,
+	): Promise<User> {
+		return this.userService.register(registerInput);
 	}
 }

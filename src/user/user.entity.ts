@@ -11,4 +11,11 @@ export class User {
 	@Column()
 	@Field()
 	name: string;
+
+	@Column({ unique: true })
+	@Field()
+	email: string;
+
+	@Column({ select: false })
+	password: string; // Обратите внимание, что поле пароля не должно быть доступно через API
 }

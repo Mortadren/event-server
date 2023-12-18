@@ -8,6 +8,8 @@ async function bootstrap() {
 	app.setGlobalPrefix('api');
 
 	await app.listen(PORT);
-	console.log(`Server is up and running on http://localhost:${PORT}/api/`);
+	console.log(
+		`Server is up and running on http://localhost:${PORT}/graphql/`,
+	);
 }
 bootstrap();
