@@ -3,5 +3,6 @@
 # ------------------------------------------------------
 
 type Query {
-  users: String!
+  name: [String!]!
+  getNum: Float!
 }
