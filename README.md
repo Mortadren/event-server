@@ -1,3 +1,4 @@
-1. npm install
-2. Обновить TypeORM конфиг в app.module.ts под свою бд
-3. npm run start:dev
+1. `npm install`
+2. Создать БД для проекта в PSQL
+3. Создать .env в корне проекта и заполнить его на примере файла _.env-example_
+4. `npm run dev`

@@ -6,7 +6,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/user.entity';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
 	imports: [
@@ -20,15 +20,19 @@ import { ConfigModule } from '@nestjs/config';
 			typePaths: ['types.graphql'],
 			playground: true,
 		}),
-		TypeOrmModule.forRoot({
-			type: 'postgres',
-			host: 'localhost', // Замените на ваш хост
-			port: 5432, // Замените на ваш порт, если отличается
-			username: 'postgres', // Замените на ваше имя пользователя
-			password: 'postgres', // Замените на ваш пароль
-			database: 'eventapp', // Замените на имя вашей базы данных
-			entities: [User], // Добавьте все ваши сущности
-			synchronize: true, // Установите false для продакшн!
+		TypeOrmModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: (configService: ConfigService) => ({
+				type: 'postgres',
+				host: configService.get('DB_HOST'),
+				port: configService.get('DB_PORT'),
+				username: configService.get('DB_USERNAME'),
+				password: configService.get('DB_PASSWORD'),
+				database: configService.get('DB_NAME'),
+				entities: [User], // Добавьте все ваши сущности
+				synchronize: configService.get('TYPEORM_SYNC'),
+			}),
+			inject: [ConfigService],
 		}),
 	],
 	controllers: [AppController],
