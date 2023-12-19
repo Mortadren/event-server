@@ -16,6 +16,6 @@ export class User {
 	@Field()
 	email: string;
 
-	@Column({ select: false })
-	password: string; // Обратите внимание, что поле пароля не должно быть доступно через API
+	@Column({ select: true })
+	password: string;
 }

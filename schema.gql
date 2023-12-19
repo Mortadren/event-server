@@ -8,6 +8,11 @@ type User {
   email: String!
 }
 
+type LoginResponse {
+  access_token: String!
+  user: User!
+}
+
 type Query {
   getUsersCount: Float!
   getUsers: [User!]!
@@ -15,10 +20,16 @@ type Query {
 
 type Mutation {
   register(registerInput: UserRegisterDTO!): User!
+  login(loginUserInput: LoginUserInput!): LoginResponse
 }
 
 input UserRegisterDTO {
   name: String!
+  email: String!
+  password: String!
+}
+
+input LoginUserInput {
   email: String!
   password: String!
 }

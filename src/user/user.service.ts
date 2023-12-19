@@ -12,6 +12,17 @@ export class UserService {
 		private userRepository: Repository<User>, // Инъекция репозитория
 	) {}
 
+	async findUserByEmail(email: string): Promise<User> {
+		const existingUser = await this.userRepository.findOne({
+			where: { email: email },
+		});
+		if (!existingUser) {
+			throw new ConflictException(`No user with email ${email}.`);
+		}
+
+		return existingUser;
+	}
+
 	async register(userData: UserRegisterDTO): Promise<User> {
 		// Проверяем, существует ли уже пользователь с таким email
 		const existingUser = await this.userRepository.findOne({
