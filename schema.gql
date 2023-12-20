@@ -4,7 +4,7 @@
 
 type User {
   id: ID!
-  name: String!
+  phoneNumber: String!
   email: String!
 }
 
@@ -24,7 +24,7 @@ type Mutation {
 }
 
 input UserRegisterDTO {
-  name: String!
+  phoneNumber: String!
   email: String!
   password: String!
 }

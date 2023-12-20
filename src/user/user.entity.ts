@@ -10,7 +10,7 @@ export class User {
 
 	@Column()
 	@Field()
-	name: string;
+	phoneNumber: string;
 
 	@Column({ unique: true })
 	@Field()

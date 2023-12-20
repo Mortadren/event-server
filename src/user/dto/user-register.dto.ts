@@ -6,7 +6,7 @@ import { IsStrongPassword } from './is-strong-password.decorator';
 export class UserRegisterDTO {
 	@Field()
 	@IsNotEmpty()
-	name: string;
+	phoneNumber: string;
 
 	@Field()
 	@IsEmail()
