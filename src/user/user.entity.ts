@@ -8,7 +8,7 @@ export class User {
 	@Field(() => ID)
 	id: number;
 
-	@Column()
+	@Column({ unique: true })
 	@Field()
 	phoneNumber: string;
 

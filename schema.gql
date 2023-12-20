@@ -24,6 +24,7 @@ type Mutation {
 }
 
 input UserRegisterDTO {
+  region: String!
   phoneNumber: String!
   email: String!
   password: String!

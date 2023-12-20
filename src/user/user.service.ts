@@ -22,6 +22,13 @@ export class UserService {
 
 		return existingUser;
 	}
+	async findUserByPhone(phoneNumber: string): Promise<User> {
+		const existingUser = await this.userRepository.findOne({
+			where: { phoneNumber: phoneNumber },
+		});
+
+		return existingUser || undefined;
+	}
 
 	async register(userData: UserRegisterDTO): Promise<User> {
 		// Проверяем, существует ли уже пользователь с таким email
