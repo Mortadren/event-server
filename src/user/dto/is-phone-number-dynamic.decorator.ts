@@ -26,6 +26,9 @@ export function IsPhoneNumberDynamic(
 						isPhoneNumber(value, relatedValue)
 					);
 				},
+				defaultMessage(args: ValidationArguments) {
+					return 'Invalid phone number';
+				},
 			},
 		});
 	};
