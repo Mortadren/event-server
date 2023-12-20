@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { UserService } from '../user.service';
 import phoneNumberFormater from '../../utils/phoneNumberFormater';
+
 async function isPhoneNumberUnique(
 	phoneNumber: string,
 	userService: UserService,
@@ -24,6 +25,9 @@ export class IsUniquePhoneNumberConstraint
 		const region = (args.object as any).region;
 		const formattedNumber = phoneNumberFormater(phoneNumber, region);
 		return await isPhoneNumberUnique(formattedNumber, this.userService);
+	}
+	defaultMessage(args: ValidationArguments) {
+		return 'Please enter a valid';
 	}
 }
 
