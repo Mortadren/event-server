@@ -15,11 +15,11 @@ export function IsRegion(validationOptions?: ValidationOptions) {
 			constraints: [],
 			options: validationOptions,
 			validator: {
-				validate(value: any, args: ValidationArguments) {
+				validate(value: any) {
 					const isRegion = regions.includes(value);
 					return value && isRegion;
 				},
-				defaultMessage(args: ValidationArguments) {
+				defaultMessage() {
 					return errors.invalidRegion;
 				},
 			},

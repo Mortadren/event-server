@@ -27,7 +27,7 @@ export function IsPhoneNumberDynamic(
 						isPhoneNumber(value, relatedValue)
 					);
 				},
-				defaultMessage(args: ValidationArguments) {
+				defaultMessage() {
 					return errors.invalidPhoneNumber;
 				},
 			},

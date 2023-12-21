@@ -5,7 +5,6 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Region } from './dto/phone.config';
-import { Type } from 'class-transformer';
 
 @Resolver(() => User)
 export class UserResolver {

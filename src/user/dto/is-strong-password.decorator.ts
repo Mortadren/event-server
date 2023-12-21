@@ -14,14 +14,14 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
 			constraints: [],
 			options: validationOptions,
 			validator: {
-				validate(value: any, args: ValidationArguments) {
+				validate(value: any) {
 					const hasLetter = /[a-zA-Z]/.test(value);
 					const hasNumber = /\d/.test(value);
 					const hasValidLength = value.length >= 8;
 
 					return hasLetter && hasNumber && hasValidLength;
 				},
-				defaultMessage(args: ValidationArguments) {
+				defaultMessage() {
 					return errors.passwordCondition;
 				},
 			},
