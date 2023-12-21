@@ -1,8 +1,4 @@
-import {
-	registerDecorator,
-	ValidationOptions,
-	ValidationArguments,
-} from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 import { errors } from '../../config/errors';
 
 export function IsStrongPassword(validationOptions?: ValidationOptions) {
