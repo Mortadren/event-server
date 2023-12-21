@@ -4,15 +4,12 @@ import { UserRegisterDTO } from './dto/user-register.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Region } from './dto/phone.config';
+import { Type } from 'class-transformer';
 
 @Resolver(() => User)
 export class UserResolver {
 	constructor(private readonly userService: UserService) {}
-
-	@Query(() => Number)
-	async getUsersCount() {
-		return this.userService.getNum();
-	}
 
 	// Доступ реализован только при наличии JWT токена в запросе из-за @UseGuards(JwtAuthGuard)
 	@Query(() => [User])
@@ -22,11 +19,21 @@ export class UserResolver {
 		return this.userService.getAll();
 	}
 
-	@Mutation(() => User)
+	@Mutation(() => String)
 	@UsePipes(new ValidationPipe({ whitelist: true }))
-	async register(
-		@Args('registerInput') registerInput: UserRegisterDTO,
+	async requestVerificationCode(
+		@Args('registerInput', { type: () => UserRegisterDTO })
+		registerInput: UserRegisterDTO,
+	): Promise<string> {
+		return this.userService.generateVerificationCode(registerInput);
+	}
+
+	@Mutation(() => User)
+	async verifyPhoneNumber(
+		@Args('phoneNumber') phoneNumber: string,
+		@Args('region') region: Region,
+		@Args('code') code: string,
 	): Promise<User> {
-		return this.userService.register(registerInput);
+		return this.userService.verifyPhoneNumber(phoneNumber, region, code);
 	}
 }

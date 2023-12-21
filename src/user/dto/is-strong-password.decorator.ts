@@ -3,6 +3,7 @@ import {
 	ValidationOptions,
 	ValidationArguments,
 } from 'class-validator';
+import { errors } from '../../config/errors';
 
 export function IsStrongPassword(validationOptions?: ValidationOptions) {
 	return function (object: Object, propertyName: string) {
@@ -21,7 +22,7 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
 					return hasLetter && hasNumber && hasValidLength;
 				},
 				defaultMessage(args: ValidationArguments) {
-					return 'Password must be at least 8 characters long and contain both letters and numbers';
+					return errors.passwordCondition;
 				},
 			},
 		});

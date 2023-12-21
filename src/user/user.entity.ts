@@ -18,4 +18,19 @@ export class User {
 
 	@Column({ select: true })
 	password: string;
+
+	@Column({ nullable: true })
+	verified: boolean;
+
+	@Column({ nullable: true })
+	verificationCode: string;
+
+	@Column({ type: 'timestamp', nullable: true })
+	verificationCodeTimestamp: Date;
+
+	@Column({ default: 0 })
+	verificationCodeAttempts: number;
+
+	@Column({ nullable: true })
+	extraTimeout: number;
 }

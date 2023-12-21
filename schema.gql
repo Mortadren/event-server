@@ -14,12 +14,12 @@ type LoginResponse {
 }
 
 type Query {
-  getUsersCount: Float!
   getUsers: [User!]!
 }
 
 type Mutation {
-  register(registerInput: UserRegisterDTO!): User!
+  requestVerificationCode(registerInput: UserRegisterDTO!): String!
+  verifyPhoneNumber(phoneNumber: String!, region: String!, code: String!): User!
   login(loginUserInput: LoginUserInput!): LoginResponse
 }
 

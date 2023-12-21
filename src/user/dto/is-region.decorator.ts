@@ -3,32 +3,24 @@ import {
 	ValidationOptions,
 	ValidationArguments,
 } from 'class-validator';
-import { isPhoneNumber } from 'class-validator';
 import { errors } from '../../config/errors';
+import { regions } from './phone.config';
 
-export function IsPhoneNumberDynamic(
-	property: string,
-	validationOptions?: ValidationOptions,
-) {
+export function IsRegion(validationOptions?: ValidationOptions) {
 	return function (object: Object, propertyName: string) {
 		registerDecorator({
-			name: 'isPhoneNumberDynamic',
+			name: 'isRegion',
 			target: object.constructor,
 			propertyName: propertyName,
-			constraints: [property],
+			constraints: [],
 			options: validationOptions,
 			validator: {
 				validate(value: any, args: ValidationArguments) {
-					const relatedValue = (args.object as any)[
-						args.constraints[0]
-					];
-					return (
-						typeof value === 'string' &&
-						isPhoneNumber(value, relatedValue)
-					);
+					const isRegion = regions.includes(value);
+					return value && isRegion;
 				},
 				defaultMessage(args: ValidationArguments) {
-					return errors.invalidPhoneNumber;
+					return errors.invalidRegion;
 				},
 			},
 		});
