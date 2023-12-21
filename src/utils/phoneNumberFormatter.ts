@@ -1,5 +1,5 @@
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { Region } from '../user/dto/phone.config';
+import { Region } from '../config/smsCode.config';
 
 function formatPhoneNumber(phoneNumber: string, region: Region): string {
 	const parsedNumber = parsePhoneNumberFromString(phoneNumber, region);

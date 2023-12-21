@@ -4,7 +4,7 @@ import {
 	ValidationArguments,
 } from 'class-validator';
 import { isPhoneNumber } from 'class-validator';
-import { errors } from '../../config/errors';
+import { errorsConfig } from '../../config/errors.config';
 
 export function IsPhoneNumberDynamic(
 	property: string,
@@ -28,7 +28,7 @@ export function IsPhoneNumberDynamic(
 					);
 				},
 				defaultMessage() {
-					return errors.invalidPhoneNumber;
+					return errorsConfig.invalidPhoneNumber;
 				},
 			},
 		});

@@ -3,10 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { UserRegisterDTO } from './dto/user-register.dto';
-import phoneNumberFormatter from '../utils/phoneNumberFormater';
+import phoneNumberFormatter from '../utils/phoneNumberFormatter';
 import * as bcrypt from 'bcrypt';
-import { codeConfig, Region } from './dto/phone.config';
-import { errors } from '../config/errors';
+import { codeConfig, Region } from '../config/smsCode.config';
+import { errorsConfig } from '../config/errors.config';
+import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
 			where: { email: email },
 		});
 		if (!existingUser) {
-			throw new ConflictException(errors.emailNotFound(email));
+			throw new ConflictException(errorsConfig.emailNotFound);
 		}
 
 		return existingUser;
@@ -32,27 +33,24 @@ export class UserService {
 
 	async generateVerificationCode(userData: UserRegisterDTO): Promise<string> {
 		const { region, email, password, phoneNumber } = userData;
-
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 
 		const userByEmail = await this.userRepository.findOne({
 			where: { email },
 		});
-
 		const userByPhone = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
 		});
 
 		const existingUser = userByPhone || userByEmail;
-
 		if (existingUser && existingUser.verified) {
-			throw new ConflictException(errors.isNotUniqueEmailOrPhone);
+			throw new ConflictException(errorsConfig.isNotUniqueEmailOrPhone);
 		}
 
 		// Генерация и сохранение кода подтверждения
-		const verificationCode = Math.floor(
-			1000 + Math.random() * 9000,
-		).toString(); // Простой 4-значный код
+		const verificationCode = generateRandomNumberWithNDigits(
+			codeConfig.codeLength,
+		).toString();
 
 		if (
 			userByPhone &&
@@ -77,7 +75,7 @@ export class UserService {
 				userByPhone?.verificationCodeTimestamp?.getTime() <=
 				codeConfig.timeout * 60000 + userByPhone.extraTimeout
 		) {
-			throw new ConflictException(errors.tooFastForNewCode);
+			throw new ConflictException(errorsConfig.tooFastForNewCode);
 		}
 
 		if (!userByPhone && !userByEmail) {
@@ -106,6 +104,7 @@ export class UserService {
 			);
 		}
 
+		//TODO Реализовать смс-сервис
 		return verificationCode; // Возврат кода пользователю (в реальности через СМС)
 	}
 
@@ -121,7 +120,7 @@ export class UserService {
 		});
 
 		if (existingUser && existingUser.verified) {
-			throw new ConflictException(errors.phoneIsInUse);
+			throw new ConflictException(errorsConfig.phoneIsInUse);
 		}
 
 		const user = await this.userRepository.findOne({
@@ -129,7 +128,7 @@ export class UserService {
 		});
 
 		if (!user) {
-			throw new ConflictException(errors.userNotFound);
+			throw new ConflictException(errorsConfig.userNotFound);
 		}
 
 		// Проверка времени жизни кода
@@ -137,7 +136,7 @@ export class UserService {
 			new Date().getTime() - user.verificationCodeTimestamp.getTime() >
 			codeConfig.timeout * 60000 + user.extraTimeout
 		) {
-			throw new ConflictException(errors.expiredCode);
+			throw new ConflictException(errorsConfig.expiredCode);
 		}
 
 		// Проверка количества попыток
@@ -150,7 +149,7 @@ export class UserService {
 				},
 			);
 
-			throw new ConflictException(errors.tooManyCodeAttempts);
+			throw new ConflictException(errorsConfig.tooManyCodeAttempts);
 		}
 
 		// Проверка кода
@@ -161,7 +160,7 @@ export class UserService {
 					verificationCodeAttempts: user.verificationCodeAttempts + 1,
 				},
 			);
-			throw new ConflictException(errors.wrongCode);
+			throw new ConflictException(errorsConfig.wrongCode);
 		}
 
 		const newData = {

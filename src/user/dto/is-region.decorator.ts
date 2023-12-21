@@ -1,6 +1,6 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { errors } from '../../config/errors';
-import { regions } from './phone.config';
+import { errorsConfig } from '../../config/errors.config';
+import { regions } from '../../config/smsCode.config';
 
 export function IsRegion(validationOptions?: ValidationOptions) {
 	return function (object: Object, propertyName: string) {
@@ -16,7 +16,7 @@ export function IsRegion(validationOptions?: ValidationOptions) {
 					return value && isRegion;
 				},
 				defaultMessage() {
-					return errors.invalidRegion;
+					return errorsConfig.invalidRegion;
 				},
 			},
 		});

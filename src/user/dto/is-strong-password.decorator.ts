@@ -1,5 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { errors } from '../../config/errors';
+import { errorsConfig } from '../../config/errors.config';
 
 export function IsStrongPassword(validationOptions?: ValidationOptions) {
 	return function (object: Object, propertyName: string) {
@@ -18,7 +18,7 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
 					return hasLetter && hasNumber && hasValidLength;
 				},
 				defaultMessage() {
-					return errors.passwordCondition;
+					return errorsConfig.passwordCondition;
 				},
 			},
 		});
