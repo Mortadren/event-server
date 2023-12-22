@@ -205,8 +205,7 @@ export class UserService {
 
 		return {
 			access_token: this.jwtService.sign({
-				userResponse,
-				sub: userResponse.id,
+				sub: { userId: userResponse.id },
 			}),
 			user: userResponse,
 		};
