@@ -12,7 +12,7 @@ export class User {
 	@Field()
 	phoneNumber: string;
 
-	@Column({ unique: true })
+	@Column()
 	@Field()
 	email: string;
 

@@ -5,7 +5,7 @@ import { User } from './user.entity';
 import { UserRegisterDTO } from './dto/user-register.dto';
 import phoneNumberFormatter from '../utils/phoneNumberFormatter';
 import * as bcrypt from 'bcrypt';
-import { codeConfig, Region } from '../config/smsCode.config';
+import { codeConfig, Region, regions } from '../config/smsCode.config';
 import { errorsConfig } from '../config/errors.config';
 import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
 
@@ -114,6 +114,10 @@ export class UserService {
 		verificationCode: string,
 	): Promise<User> {
 		// Проверка данных пользователя и кода подтверждения
+		const IsRegion = regions.includes(region);
+		if (!IsRegion) {
+			throw new ConflictException(errorsConfig.invalidRegion);
+		}
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 		const existingUser = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
@@ -145,7 +149,8 @@ export class UserService {
 				{ phoneNumber: formattedNumber },
 				{
 					verificationCodeAttempts: 0,
-					extraTimeout: codeConfig.extraTimeout * 60000,
+					extraTimeout:
+						codeConfig.extraTimeout * 60000 + user.extraTimeout,
 				},
 			);
 

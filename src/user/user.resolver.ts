@@ -28,6 +28,7 @@ export class UserResolver {
 	}
 
 	@Mutation(() => User)
+	@UsePipes(new ValidationPipe({ whitelist: true }))
 	async verifyPhoneNumber(
 		@Args('phoneNumber') phoneNumber: string,
 		@Args('region') region: Region,
