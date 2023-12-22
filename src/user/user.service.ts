@@ -8,12 +8,14 @@ import * as bcrypt from 'bcrypt';
 import { codeConfig, Region, regions } from '../config/smsCode.config';
 import { errorsConfig } from '../config/errors.config';
 import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
+		private jwtService: JwtService,
 	) {}
 
 	async findUserByEmail(email: string): Promise<User> {
@@ -112,7 +114,10 @@ export class UserService {
 		phoneNumber: string,
 		region: Region,
 		verificationCode: string,
-	): Promise<User> {
+	): Promise<{
+		access_token: string;
+		user: User;
+	}> {
 		// Проверка данных пользователя и кода подтверждения
 		const IsRegion = regions.includes(region);
 		if (!IsRegion) {
@@ -181,7 +186,15 @@ export class UserService {
 			{ phoneNumber: formattedNumber },
 			newData,
 		);
-
-		return user;
+		const userResponse = await this.userRepository.findOne({
+			where: { phoneNumber: formattedNumber },
+		});
+		return {
+			access_token: this.jwtService.sign({
+				userResponse,
+				sub: userResponse.id,
+			}),
+			user: userResponse,
+		};
 	}
 }

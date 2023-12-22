@@ -5,6 +5,7 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Region } from '../config/smsCode.config';
+import { LoginResponse } from 'src/auth/dto/login-response';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -27,13 +28,16 @@ export class UserResolver {
 		return this.userService.generateVerificationCode(registerInput);
 	}
 
-	@Mutation(() => User)
+	@Mutation(() => LoginResponse, { nullable: true })
 	@UsePipes(new ValidationPipe({ whitelist: true }))
 	async verifyPhoneNumber(
 		@Args('phoneNumber') phoneNumber: string,
 		@Args('region') region: Region,
 		@Args('code') code: string,
-	): Promise<User> {
+	): Promise<{
+		access_token: string;
+		user: User;
+	}> {
 		return this.userService.verifyPhoneNumber(phoneNumber, region, code);
 	}
 }

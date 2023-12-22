@@ -19,7 +19,7 @@ type Query {
 
 type Mutation {
   requestVerificationCode(registerInput: UserRegisterDTO!): String!
-  verifyPhoneNumber(phoneNumber: String!, region: String!, code: String!): User!
+  verifyPhoneNumber(phoneNumber: String!, region: String!, code: String!): LoginResponse
   login(loginUserInput: LoginUserInput!): LoginResponse
 }
 
