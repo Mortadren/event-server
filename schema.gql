@@ -20,7 +20,8 @@ type Query {
 type Mutation {
   requestVerificationCode(registerInput: UserRegisterDTO!): String!
   verifyPhoneNumber(verifyInput: VerifyInputDTO!): LoginResponse
-  login(loginUserInput: LoginUserInput!): LoginResponse
+  loginByEmail(loginUserInput: LoginUserInput!): LoginResponse
+  loginWithPhone(loginByPhoneUserInput: LoginByPhoneUserInput!): LoginResponse!
 }
 
 input UserRegisterDTO {
@@ -38,5 +39,11 @@ input VerifyInputDTO {
 
 input LoginUserInput {
   email: String!
+  password: String!
+}
+
+input LoginByPhoneUserInput {
+  phoneNumber: String!
+  region: String!
   password: String!
 }

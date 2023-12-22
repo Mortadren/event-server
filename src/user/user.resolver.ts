@@ -5,7 +5,7 @@ import { User } from './user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { LoginResponse } from 'src/auth/dto/login-response';
-import { VerifyInputDTO } from './dto/verify-inpput.dto';
+import { VerifyInputDTO } from './dto/verify-input.dto';
 
 @Resolver(() => User)
 export class UserResolver {

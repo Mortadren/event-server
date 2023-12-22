@@ -3,6 +3,7 @@ import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { LoginByPhoneUserInput } from './dto/loginByPhone-user.input';
 
 @Injectable()
 export class AuthService {
@@ -13,15 +14,31 @@ export class AuthService {
 
 	async validateUserViaEmail(email: string, password: string): Promise<any> {
 		const user = await this.userService.findUserByEmail(email);
-		const passwordsAreEqual = await bcrypt.compare(password, user.password);
 
-		if (user && passwordsAreEqual && user.verified) {
-			const { password, ...result } = user;
-			return result;
+		if (user && user.verified) {
+			const passwordsAreEqual = await bcrypt.compare(password, user.password);
+			if (passwordsAreEqual ) {
+				const { password, ...result } = user;
+				return result;
+			}
 		}
-
 		return null;
 	}
+
+	async validateUserViaPhoneNumber(loginByPhone: LoginByPhoneUserInput): Promise<any> {
+		const {phoneNumber, region, password } = loginByPhone;
+		const user = await this.userService.findUserByPhoneNumber(phoneNumber, region);
+
+		if (user && user.verified) {
+			const passwordsAreEqual = await bcrypt.compare(password, user.password);
+			if (passwordsAreEqual) {
+				const { password, ...result } = user;
+				return result;
+			}
+		}
+		return null;
+	}
+
 
 	async login(user: User) {
 		return {

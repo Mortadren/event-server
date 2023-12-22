@@ -5,11 +5,11 @@ import { User } from './user.entity';
 import { UserRegisterDTO } from './dto/user-register.dto';
 import phoneNumberFormatter from '../utils/phoneNumberFormatter';
 import * as bcrypt from 'bcrypt';
-import { codeConfig, regions } from '../config/smsCode.config';
+import { codeConfig, Region, regions } from '../config/smsCode.config';
 import { errorsConfig } from '../config/errors.config';
 import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
 import { JwtService } from '@nestjs/jwt';
-import { VerifyInputDTO } from './dto/verify-inpput.dto';
+import { VerifyInputDTO } from './dto/verify-input.dto';
 
 @Injectable()
 export class UserService {
@@ -29,6 +29,18 @@ export class UserService {
 
 		return existingUser;
 	}
+
+	async findUserByPhoneNumber(phoneNumber: string, region: Region): Promise<User> {
+		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
+		const existingUser = this.userRepository.findOne({ where: { phoneNumber: formattedNumber } })
+
+		if (!existingUser) {
+			throw new ConflictException(errorsConfig.emailNotFound);
+		}
+
+		return existingUser;
+	}
+
 
 	async getAll() {
 		return this.userRepository.find();
