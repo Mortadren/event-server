@@ -15,7 +15,7 @@ export class AuthService {
 		const user = await this.userService.findUserByEmail(email);
 		const passwordsAreEqual = await bcrypt.compare(password, user.password);
 
-		if (user && passwordsAreEqual) {
+		if (user && passwordsAreEqual && user.verified) {
 			const { password, ...result } = user;
 			return result;
 		}
