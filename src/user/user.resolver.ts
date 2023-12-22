@@ -4,8 +4,8 @@ import { UserRegisterDTO } from './dto/user-register.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Region } from '../config/smsCode.config';
 import { LoginResponse } from 'src/auth/dto/login-response';
+import { VerifyInputDTO } from './dto/verify-inpput.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -31,13 +31,12 @@ export class UserResolver {
 	@Mutation(() => LoginResponse, { nullable: true })
 	@UsePipes(new ValidationPipe({ whitelist: true }))
 	async verifyPhoneNumber(
-		@Args('phoneNumber') phoneNumber: string,
-		@Args('region') region: Region,
-		@Args('code') code: string,
+		@Args('verifyInput', {type: () => VerifyInputDTO})
+			verifyInput: VerifyInputDTO,
 	): Promise<{
 		access_token: string;
 		user: User;
 	}> {
-		return this.userService.verifyPhoneNumber(phoneNumber, region, code);
+		return this.userService.verifyPhoneNumber(verifyInput);
 	}
 }

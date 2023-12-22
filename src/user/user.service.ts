@@ -5,10 +5,11 @@ import { User } from './user.entity';
 import { UserRegisterDTO } from './dto/user-register.dto';
 import phoneNumberFormatter from '../utils/phoneNumberFormatter';
 import * as bcrypt from 'bcrypt';
-import { codeConfig, Region, regions } from '../config/smsCode.config';
+import { codeConfig, regions } from '../config/smsCode.config';
 import { errorsConfig } from '../config/errors.config';
 import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
 import { JwtService } from '@nestjs/jwt';
+import { VerifyInputDTO } from './dto/verify-inpput.dto';
 
 @Injectable()
 export class UserService {
@@ -111,13 +112,12 @@ export class UserService {
 	}
 
 	async verifyPhoneNumber(
-		phoneNumber: string,
-		region: Region,
-		verificationCode: string,
+		verifyInput: VerifyInputDTO
 	): Promise<{
 		access_token: string;
 		user: User;
 	}> {
+		const {region, phoneNumber, code} = verifyInput;
 		// Проверка данных пользователя и кода подтверждения
 		const IsRegion = regions.includes(region);
 		if (!IsRegion) {
@@ -163,7 +163,7 @@ export class UserService {
 		}
 
 		// Проверка кода
-		if (verificationCode !== user.verificationCode) {
+		if (code !== user.verificationCode) {
 			await this.userRepository.update(
 				{ phoneNumber: formattedNumber },
 				{
@@ -189,6 +189,8 @@ export class UserService {
 		const userResponse = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
 		});
+
+
 		return {
 			access_token: this.jwtService.sign({
 				userResponse,
