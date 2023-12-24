@@ -10,6 +10,8 @@ import { errorsConfig } from '../config/errors.config';
 import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
 import { JwtService } from '@nestjs/jwt';
 import { VerifyInputDTO } from './dto/verify-input.dto';
+import { CheckPhoneDTO } from './dto/check-phoneNum.dto';
+import { CheckEmailDTO } from './dto/check-email.dto';
 
 @Injectable()
 export class UserService {
@@ -30,9 +32,14 @@ export class UserService {
 		return existingUser;
 	}
 
-	async findUserByPhoneNumber(phoneNumber: string, region: Region): Promise<User> {
+	async findUserByPhoneNumber(
+		phoneNumber: string,
+		region: Region,
+	): Promise<User> {
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
-		const existingUser = this.userRepository.findOne({ where: { phoneNumber: formattedNumber } })
+		const existingUser = this.userRepository.findOne({
+			where: { phoneNumber: formattedNumber },
+		});
 
 		if (!existingUser) {
 			throw new ConflictException(errorsConfig.emailNotFound);
@@ -40,7 +47,6 @@ export class UserService {
 
 		return existingUser;
 	}
-
 
 	async getAll() {
 		return this.userRepository.find();
@@ -123,13 +129,11 @@ export class UserService {
 		return verificationCode; // Возврат кода пользователю (в реальности через СМС)
 	}
 
-	async verifyPhoneNumber(
-		verifyInput: VerifyInputDTO
-	): Promise<{
+	async verifyPhoneNumber(verifyInput: VerifyInputDTO): Promise<{
 		access_token: string;
 		user: User;
 	}> {
-		const {region, phoneNumber, code} = verifyInput;
+		const { region, phoneNumber, code } = verifyInput;
 		// Проверка данных пользователя и кода подтверждения
 		const IsRegion = regions.includes(region);
 		if (!IsRegion) {
@@ -202,12 +206,32 @@ export class UserService {
 			where: { phoneNumber: formattedNumber },
 		});
 
-
 		return {
 			access_token: this.jwtService.sign({
 				sub: { userId: userResponse.id },
 			}),
 			user: userResponse,
 		};
+	}
+
+	//проверка емейла на уникальность
+	async checkEmailUniqueness(checkEmailDTO: CheckEmailDTO) {
+		const { email } = checkEmailDTO;
+		const userWithEmail = await this.userRepository.findOne({
+			where: { email },
+		});
+
+		return { unique: !userWithEmail, field: email };
+	}
+
+	//проверка номера на уникальность
+	async checkPhoneNumberUniqueness(checkPhoneDTO: CheckPhoneDTO) {
+		const { phoneNumber, region } = checkPhoneDTO;
+		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
+		const userWithPhoneNumber = await this.userRepository.findOne({
+			where: { phoneNumber: formattedNumber },
+		});
+
+		return { unique: !userWithPhoneNumber, field: formattedNumber };
 	}
 }
