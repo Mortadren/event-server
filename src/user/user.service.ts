@@ -58,7 +58,7 @@ export class UserService {
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 
 		const userByEmail = await this.userRepository.findOne({
-			where: { email: email},
+			where: { email: email },
 		});
 		const userByPhone = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
@@ -88,7 +88,15 @@ export class UserService {
 					password: await bcrypt.hash(password, 10),
 					verificationCode,
 					verificationCodeTimestamp: new Date(),
-					verificationCodeAttempts: 0, // Сброс количества попыток
+					verificationCodeAttempts:
+						userByPhone.verificationCodeAttempts >= 4
+							? 0
+							: userByPhone.verificationCodeAttempts + 1,
+					extraTimeout:
+						userByEmail.verificationCodeAttempts >= 4
+							? codeConfig.extraTimeout * 60000 +
+								userByEmail.extraTimeout
+							: userByEmail.extraTimeout,
 				},
 			);
 		} else if (
@@ -110,7 +118,7 @@ export class UserService {
 				password: await bcrypt.hash(userData.password, 10),
 				phoneNumber: formattedNumber,
 				extraTimeout: 0,
-				createdAt: new Date()
+				createdAt: new Date(),
 			});
 
 			await this.userRepository.save(newUser);
@@ -122,7 +130,15 @@ export class UserService {
 					password: await bcrypt.hash(password, 10),
 					verificationCode,
 					verificationCodeTimestamp: new Date(),
-					verificationCodeAttempts: 0, // Сброс количества попыток
+					verificationCodeAttempts:
+						userByEmail.verificationCodeAttempts >= 4
+							? 0
+							: userByEmail.verificationCodeAttempts + 1,
+					extraTimeout:
+						userByEmail.verificationCodeAttempts >= 4
+							? codeConfig.extraTimeout * 60000 +
+								userByEmail.extraTimeout
+							: userByEmail.extraTimeout,
 				},
 			);
 		}
@@ -224,8 +240,12 @@ export class UserService {
 		});
 
 		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
-		const unique = !(userWithEmail && (((new Date().getTime() - userWithEmail?.createdAt.getTime()) < userConfig.uniquenessTimeout) || userWithEmail.verified))
-
+		const unique = !(
+			userWithEmail &&
+			(new Date().getTime() - userWithEmail?.createdAt.getTime() <
+				userConfig.uniquenessTimeout ||
+				userWithEmail.verified)
+		);
 
 		return { unique: unique, field: email };
 	}
@@ -239,8 +259,13 @@ export class UserService {
 		});
 
 		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
-		const unique = !(userWithPhoneNumber && (((new Date().getTime() - userWithPhoneNumber?.createdAt.getTime()) < userConfig.uniquenessTimeout) || userWithPhoneNumber.verified))
-		
+		const unique = !(
+			userWithPhoneNumber &&
+			(new Date().getTime() - userWithPhoneNumber?.createdAt.getTime() <
+				userConfig.uniquenessTimeout ||
+				userWithPhoneNumber.verified)
+		);
+
 		console.log(userWithPhoneNumber);
 
 		return { unique, field: formattedNumber };
