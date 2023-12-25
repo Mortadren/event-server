@@ -218,7 +218,7 @@ export class UserService {
 	async checkEmailUniqueness(checkEmailDTO: CheckEmailDTO) {
 		const { email } = checkEmailDTO;
 		const userWithEmail = await this.userRepository.findOne({
-			where: { email },
+			where: { email, verified: true },
 		});
 
 		return { unique: !userWithEmail, field: email };
@@ -229,7 +229,7 @@ export class UserService {
 		const { phoneNumber, region } = checkPhoneDTO;
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 		const userWithPhoneNumber = await this.userRepository.findOne({
-			where: { phoneNumber: formattedNumber },
+			where: { phoneNumber: formattedNumber, verified: true },
 		});
 
 		return { unique: !userWithPhoneNumber, field: formattedNumber };
