@@ -36,4 +36,7 @@ export class User {
 
 	@Column({ nullable: true })
 	extraTimeout: number;
+
+	@Column({ type: 'timestamp' })
+	createdAt: Date;
 }

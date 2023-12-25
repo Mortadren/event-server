@@ -13,6 +13,7 @@ import { VerifyInputDTO } from './dto/verify-input.dto';
 import { AuthService } from '../auth/auth.service';
 import { CheckPhoneDTO } from './dto/check-phoneNum.dto';
 import { CheckEmailDTO } from './dto/check-email.dto';
+import { userConfig } from '../config/userConfig';
 
 @Injectable()
 export class UserService {
@@ -65,7 +66,7 @@ export class UserService {
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 
 		const userByEmail = await this.userRepository.findOne({
-			where: { email },
+			where: { email: email, verified: true },
 		});
 		const userByPhone = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
@@ -117,6 +118,7 @@ export class UserService {
 				password: await bcrypt.hash(userData.password, 10),
 				phoneNumber: formattedNumber,
 				extraTimeout: 0,
+				createdAt: new Date()
 			});
 
 			await this.userRepository.save(newUser);
@@ -225,10 +227,14 @@ export class UserService {
 	async checkEmailUniqueness(checkEmailDTO: CheckEmailDTO) {
 		const { email } = checkEmailDTO;
 		const userWithEmail = await this.userRepository.findOne({
-			where: { email, verified: true },
+			where: { email },
 		});
 
-		return { unique: !userWithEmail, field: email };
+		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
+		const unique = !(userWithEmail && (((new Date().getTime() - userWithEmail?.createdAt.getTime()) < userConfig.uniquenessTimeout) || userWithEmail.verified))
+
+
+		return { unique: unique, field: email };
 	}
 
 	//проверка номера на уникальность
@@ -236,9 +242,14 @@ export class UserService {
 		const { phoneNumber, region } = checkPhoneDTO;
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 		const userWithPhoneNumber = await this.userRepository.findOne({
-			where: { phoneNumber: formattedNumber, verified: true },
+			where: { phoneNumber: formattedNumber },
 		});
 
-		return { unique: !userWithPhoneNumber, field: formattedNumber };
+		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
+		const unique = !(userWithPhoneNumber && (((new Date().getTime() - userWithPhoneNumber?.createdAt.getTime()) < userConfig.uniquenessTimeout) || userWithPhoneNumber.verified))
+		
+		console.log(userWithPhoneNumber);
+
+		return { unique, field: formattedNumber };
 	}
 }
