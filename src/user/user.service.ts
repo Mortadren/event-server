@@ -58,7 +58,7 @@ export class UserService {
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 
 		const userByEmail = await this.userRepository.findOne({
-			where: { email: email, verified: true },
+			where: { email: email},
 		});
 		const userByPhone = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
