@@ -16,6 +16,9 @@ export class User {
 	@Field()
 	email: string;
 
+	@Column({ nullable: true })
+	refreshToken: string;
+
 	@Column({ select: true })
 	password: string;
 

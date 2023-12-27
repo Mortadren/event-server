@@ -10,7 +10,7 @@ type User {
 
 type LoginResponse {
   access_token: String!
-  user: User!
+  refresh_token: String!
 }
 
 type Query {

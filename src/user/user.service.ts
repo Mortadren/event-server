@@ -18,7 +18,13 @@ export class UserService {
 		private userRepository: Repository<User>,
 		private jwtService: JwtService,
 	) {}
+	async updateById(id: number, data: any): Promise<any> {
+		await this.userRepository.update(id, data);
+	}
 
+	async findById(id: number): Promise<User | undefined> {
+		return this.userRepository.findOne({ where: { id: id } });
+	}
 	async findUserByEmail(email: string): Promise<User> {
 		const existingUser = await this.userRepository.findOne({
 			where: { email: email },
@@ -30,9 +36,14 @@ export class UserService {
 		return existingUser;
 	}
 
-	async findUserByPhoneNumber(phoneNumber: string, region: Region): Promise<User> {
+	async findUserByPhoneNumber(
+		phoneNumber: string,
+		region: Region,
+	): Promise<User> {
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
-		const existingUser = this.userRepository.findOne({ where: { phoneNumber: formattedNumber } })
+		const existingUser = this.userRepository.findOne({
+			where: { phoneNumber: formattedNumber },
+		});
 
 		if (!existingUser) {
 			throw new ConflictException(errorsConfig.emailNotFound);
@@ -40,7 +51,6 @@ export class UserService {
 
 		return existingUser;
 	}
-
 
 	async getAll() {
 		return this.userRepository.find();
@@ -123,13 +133,11 @@ export class UserService {
 		return verificationCode; // Возврат кода пользователю (в реальности через СМС)
 	}
 
-	async verifyPhoneNumber(
-		verifyInput: VerifyInputDTO
-	): Promise<{
+	async verifyPhoneNumber(verifyInput: VerifyInputDTO): Promise<{
 		access_token: string;
 		user: User;
 	}> {
-		const {region, phoneNumber, code} = verifyInput;
+		const { region, phoneNumber, code } = verifyInput;
 		// Проверка данных пользователя и кода подтверждения
 		const IsRegion = regions.includes(region);
 		if (!IsRegion) {
@@ -201,7 +209,6 @@ export class UserService {
 		const userResponse = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
 		});
-
 
 		return {
 			access_token: this.jwtService.sign({
