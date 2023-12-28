@@ -15,7 +15,6 @@ import { RefreshTokenService } from './refreshToken.service';
 		ConfigModule,
 		PassportModule,
 		UserModule,
-
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
 			useFactory: async (configService: ConfigService) => ({
@@ -35,6 +34,6 @@ import { RefreshTokenService } from './refreshToken.service';
 		PhoneNumberStrategy,
 		RefreshTokenService,
 	],
-	exports: [RefreshTokenService, AuthService],
+	exports: [RefreshTokenService],
 })
 export class AuthModule {}

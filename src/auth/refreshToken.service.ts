@@ -1,14 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '../user/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 // TODO: надо добавить обработку ошибок с бд
 
 @Injectable()
 export class RefreshTokenService {
-	constructor(private userService: UserService) {}
+	constructor(
+		@Inject(forwardRef(() => UserService))
+		private userService: UserService) {}
 
 	async saveRefreshToken(
 		userId: number,
@@ -33,10 +32,8 @@ export class RefreshTokenService {
 		// Проверка валидности refresh токена для указанного пользователя
 		const user = await this.userService.findById(userId);
 
-		if (user && user.refreshToken === refreshToken) {
-			return true;
-		}
+		return user && user.refreshToken === refreshToken;
 
-		return false;
+
 	}
 }
