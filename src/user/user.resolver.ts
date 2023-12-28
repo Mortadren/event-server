@@ -31,11 +31,11 @@ export class UserResolver {
 	@Mutation(() => LoginResponse, { nullable: true })
 	@UsePipes(new ValidationPipe({ whitelist: true }))
 	async verifyPhoneNumber(
-		@Args('verifyInput', {type: () => VerifyInputDTO})
-			verifyInput: VerifyInputDTO,
+		@Args('verifyInput', { type: () => VerifyInputDTO })
+		verifyInput: VerifyInputDTO,
 	): Promise<{
 		access_token: string;
-		user: User;
+		refresh_token: string;
 	}> {
 		return this.userService.verifyPhoneNumber(verifyInput);
 	}

@@ -35,6 +35,6 @@ import { RefreshTokenService } from './refreshToken.service';
 		PhoneNumberStrategy,
 		RefreshTokenService,
 	],
-	exports: [RefreshTokenService],
+	exports: [RefreshTokenService, AuthService],
 })
 export class AuthModule {}

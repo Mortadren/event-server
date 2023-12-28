@@ -6,6 +6,8 @@ import { User } from './user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
+import { AuthService } from 'src/auth/auth.service';
+import { RefreshTokenService } from 'src/auth/refreshToken.service';
 
 @Module({
 	imports: [
@@ -21,7 +23,13 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
 			inject: [ConfigService],
 		}),
 	],
-	providers: [UserService, UserResolver, JwtStrategy],
-	exports: [UserService],
+	providers: [
+		UserService,
+		UserResolver,
+		JwtStrategy,
+		AuthService,
+		RefreshTokenService,
+	],
+	exports: [UserService, AuthService],
 })
 export class UserModule {}

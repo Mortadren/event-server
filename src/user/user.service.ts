@@ -10,6 +10,7 @@ import { errorsConfig } from '../config/errors.config';
 import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWithNDigits';
 import { JwtService } from '@nestjs/jwt';
 import { VerifyInputDTO } from './dto/verify-input.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,7 @@ export class UserService {
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
 		private jwtService: JwtService,
+		private authService: AuthService,
 	) {}
 	async updateById(id: number, data: any): Promise<any> {
 		await this.userRepository.update(id, data);
@@ -135,7 +137,7 @@ export class UserService {
 
 	async verifyPhoneNumber(verifyInput: VerifyInputDTO): Promise<{
 		access_token: string;
-		user: User;
+		refresh_token: string;
 	}> {
 		const { region, phoneNumber, code } = verifyInput;
 		// Проверка данных пользователя и кода подтверждения
@@ -210,11 +212,10 @@ export class UserService {
 			where: { phoneNumber: formattedNumber },
 		});
 
+		const verifyRequest = await this.authService.login(user);
 		return {
-			access_token: this.jwtService.sign({
-				sub: { userId: userResponse.id },
-			}),
-			user: userResponse,
+			access_token: verifyRequest.access_token,
+			refresh_token: verifyRequest.refresh_token,
 		};
 	}
 }
