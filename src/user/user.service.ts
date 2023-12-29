@@ -11,6 +11,8 @@ import { generateRandomNumberWithNDigits } from '../utils/generateRandomNumberWi
 import { JwtService } from '@nestjs/jwt';
 import { VerifyInputDTO } from './dto/verify-input.dto';
 import { AuthService } from '../auth/auth.service';
+import { CheckPhoneDTO } from './dto/check-phoneNum.dto';
+import { CheckEmailDTO } from './dto/check-email.dto';
 
 @Injectable()
 export class UserService {
@@ -217,5 +219,26 @@ export class UserService {
 			access_token: verifyRequest.access_token,
 			refresh_token: verifyRequest.refresh_token,
 		};
+	}
+
+	//проверка емейла на уникальность
+	async checkEmailUniqueness(checkEmailDTO: CheckEmailDTO) {
+		const { email } = checkEmailDTO;
+		const userWithEmail = await this.userRepository.findOne({
+			where: { email },
+		});
+
+		return { unique: !userWithEmail, field: email };
+	}
+
+	//проверка номера на уникальность
+	async checkPhoneNumberUniqueness(checkPhoneDTO: CheckPhoneDTO) {
+		const { phoneNumber, region } = checkPhoneDTO;
+		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
+		const userWithPhoneNumber = await this.userRepository.findOne({
+			where: { phoneNumber: formattedNumber },
+		});
+
+		return { unique: !userWithPhoneNumber, field: formattedNumber };
 	}
 }

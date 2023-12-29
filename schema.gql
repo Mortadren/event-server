@@ -13,6 +13,16 @@ type LoginResponse {
   refresh_token: String!
 }
 
+type CheckedEmailDTO {
+  unique: Boolean!
+  field: String!
+}
+
+type CheckedPhoneDTO {
+  unique: Boolean!
+  field: String!
+}
+
 type Query {
   getUsers: [User!]!
 }
@@ -20,6 +30,8 @@ type Query {
 type Mutation {
   requestVerificationCode(registerInput: UserRegisterDTO!): String!
   verifyPhoneNumber(verifyInput: VerifyInputDTO!): LoginResponse
+  checkUniqueEmail(checkEmailDTO: CheckEmailDTO!): CheckedEmailDTO!
+  checkUniquePhoneNumber(checkPhoneDTO: CheckPhoneDTO!): CheckedPhoneDTO!
   loginByEmail(loginUserInput: LoginUserInput!): LoginResponse
   loginWithPhone(loginByPhoneUserInput: LoginByPhoneUserInput!): LoginResponse!
 }
@@ -35,6 +47,15 @@ input VerifyInputDTO {
   region: String!
   phoneNumber: String!
   code: String!
+}
+
+input CheckEmailDTO {
+  email: String!
+}
+
+input CheckPhoneDTO {
+  phoneNumber: String!
+  region: String!
 }
 
 input LoginUserInput {

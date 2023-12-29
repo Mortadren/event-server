@@ -6,6 +6,8 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { LoginResponse } from 'src/auth/dto/login-response';
 import { VerifyInputDTO } from './dto/verify-input.dto';
+import { CheckEmailDTO, CheckedEmailDTO } from './dto/check-email.dto';
+import { CheckPhoneDTO, CheckedPhoneDTO } from './dto/check-phoneNum.dto';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -38,5 +40,22 @@ export class UserResolver {
 		refresh_token: string;
 	}> {
 		return this.userService.verifyPhoneNumber(verifyInput);
+	}
+	@Mutation(() => CheckedEmailDTO)
+	@UsePipes(new ValidationPipe({ whitelist: true }))
+	async checkUniqueEmail(
+		@Args('checkEmailDTO', { type: () => CheckEmailDTO })
+		checkEmailDTO: CheckEmailDTO,
+	): Promise<CheckedEmailDTO> {
+		return this.userService.checkEmailUniqueness(checkEmailDTO);
+	}
+
+	@Mutation(() => CheckedPhoneDTO)
+	@UsePipes(new ValidationPipe({ whitelist: true }))
+	async checkUniquePhoneNumber(
+		@Args('checkPhoneDTO', { type: () => CheckPhoneDTO })
+		checkPhoneDTO: CheckPhoneDTO,
+	): Promise<CheckedPhoneDTO> {
+		return this.userService.checkPhoneNumberUniqueness(checkPhoneDTO);
 	}
 }
