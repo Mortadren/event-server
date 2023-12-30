@@ -1,5 +1,4 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { User } from '../../user/user.entity';
 
 @ObjectType()
 export class LoginResponse {
@@ -8,7 +7,13 @@ export class LoginResponse {
 
 	@Field()
 	refresh_token: string;
+}
 
-	// @Field(() => User)
-	// user: User;
+@ObjectType()
+export class GenerateCodeResponse {
+	@Field()
+	verificationCode: string;
+
+	@Field()
+	timestampAfterTimeout: number;
 }

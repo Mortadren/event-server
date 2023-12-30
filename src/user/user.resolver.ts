@@ -4,7 +4,10 @@ import { UserRegisterDTO } from './dto/user-register.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { LoginResponse } from 'src/auth/dto/login-response';
+import {
+	GenerateCodeResponse,
+	LoginResponse,
+} from 'src/auth/dto/login-response';
 import { VerifyInputDTO } from './dto/verify-input.dto';
 import { CheckEmailDTO, CheckedEmailDTO } from './dto/check-email.dto';
 import { CheckPhoneDTO, CheckedPhoneDTO } from './dto/check-phoneNum.dto';
@@ -21,12 +24,12 @@ export class UserResolver {
 		return this.userService.getAll();
 	}
 
-	@Mutation(() => String)
+	@Mutation(() => GenerateCodeResponse)
 	@UsePipes(new ValidationPipe({ whitelist: true }))
 	async requestVerificationCode(
 		@Args('registerInput', { type: () => UserRegisterDTO })
 		registerInput: UserRegisterDTO,
-	): Promise<string> {
+	): Promise<GenerateCodeResponse> {
 		return this.userService.generateVerificationCode(registerInput);
 	}
 

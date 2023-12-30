@@ -13,7 +13,6 @@ import { VerifyInputDTO } from './dto/verify-input.dto';
 import { AuthService } from '../auth/auth.service';
 import { CheckPhoneDTO } from './dto/check-phoneNum.dto';
 import { CheckEmailDTO } from './dto/check-email.dto';
-import { userConfig } from '../config/userConfig';
 
 @Injectable()
 export class UserService {
@@ -61,14 +60,16 @@ export class UserService {
 		return this.userRepository.find();
 	}
 
-	async generateVerificationCode(userData: UserRegisterDTO): Promise<string> {
+	async generateVerificationCode(
+		userData: UserRegisterDTO,
+	): Promise<{ verificationCode: string; timestampAfterTimeout: number }> {
 		const { region, email, password, phoneNumber } = userData;
 		const formattedNumber = phoneNumberFormatter(phoneNumber, region);
 
-		const userByEmail = await this.userRepository.findOne({
+		let userByEmail = await this.userRepository.findOne({
 			where: { email: email },
 		});
-		const userByPhone = await this.userRepository.findOne({
+		let userByPhone = await this.userRepository.findOne({
 			where: { phoneNumber: formattedNumber },
 		});
 
@@ -101,12 +102,17 @@ export class UserService {
 							? 0
 							: userByPhone.verificationCodeAttempts + 1,
 					extraTimeout:
-						userByEmail.verificationCodeAttempts >= 4
+						userByPhone.verificationCodeAttempts >= 4
 							? codeConfig.extraTimeout * 60000 +
-								userByEmail.extraTimeout
-							: userByEmail.extraTimeout,
+								userByPhone.extraTimeout
+							: userByPhone.extraTimeout,
 				},
 			);
+			userByEmail = await this.userRepository.findOne({
+				where: {
+					email,
+				},
+			});
 		} else if (
 			userByPhone &&
 			new Date().getTime() -
@@ -130,6 +136,11 @@ export class UserService {
 			});
 
 			await this.userRepository.save(newUser);
+
+			return {
+				verificationCode: verificationCode,
+				timestampAfterTimeout: Date.now() + codeConfig.timeout * 60000,
+			};
 		} else if (userByEmail) {
 			await this.userRepository.update(
 				{ email },
@@ -149,10 +160,32 @@ export class UserService {
 							: userByEmail.extraTimeout,
 				},
 			);
+
+			userByPhone = await this.userRepository.findOne({
+				where: {
+					phoneNumber: formattedNumber,
+				},
+			});
 		}
 
+		const result = () => {
+			let extraTimeout = 0;
+
+			if (userByPhone || userByEmail) {
+				extraTimeout = userByPhone
+					? userByPhone.extraTimeout
+					: userByEmail.extraTimeout;
+			}
+
+			return {
+				verificationCode: verificationCode,
+				timestampAfterTimeout:
+					Date.now() + codeConfig.timeout * 60000 + extraTimeout,
+			};
+		};
+
 		//TODO Реализовать смс-сервис
-		return verificationCode; // Возврат кода пользователю (в реальности через СМС)
+		return result(); // Возврат кода пользователю (в реальности через СМС)
 	}
 
 	async verifyPhoneNumber(verifyInput: VerifyInputDTO): Promise<{
@@ -228,9 +261,6 @@ export class UserService {
 			{ phoneNumber: formattedNumber },
 			newData,
 		);
-		const userResponse = await this.userRepository.findOne({
-			where: { phoneNumber: formattedNumber },
-		});
 
 		const verifyRequest = await this.authService.login(user);
 		return {
@@ -247,12 +277,7 @@ export class UserService {
 		});
 
 		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
-		const unique = !(
-			userWithEmail &&
-			(new Date().getTime() - userWithEmail?.createdAt.getTime() <
-				userConfig.uniquenessTimeout ||
-				userWithEmail.verified)
-		);
+		const unique = !(userWithEmail && userWithEmail.verified);
 
 		return { unique: unique, field: email };
 	}
@@ -266,15 +291,9 @@ export class UserService {
 		});
 
 		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
-		const unique = !(
-			userWithPhoneNumber &&
-			(new Date().getTime() - userWithPhoneNumber?.createdAt.getTime() <
-				userConfig.uniquenessTimeout ||
-				userWithPhoneNumber.verified)
-		);
+		const unique = !(userWithPhoneNumber && userWithPhoneNumber.verified);
 
 		console.log(userWithPhoneNumber);
-
 		return { unique, field: formattedNumber };
 	}
 }

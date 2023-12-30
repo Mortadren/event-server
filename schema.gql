@@ -13,6 +13,11 @@ type LoginResponse {
   refresh_token: String!
 }
 
+type GenerateCodeResponse {
+  verificationCode: String!
+  timestampAfterTimeout: Float!
+}
+
 type CheckedEmailDTO {
   unique: Boolean!
   field: String!
@@ -28,7 +33,7 @@ type Query {
 }
 
 type Mutation {
-  requestVerificationCode(registerInput: UserRegisterDTO!): String!
+  requestVerificationCode(registerInput: UserRegisterDTO!): GenerateCodeResponse!
   verifyPhoneNumber(verifyInput: VerifyInputDTO!): LoginResponse
   checkUniqueEmail(checkEmailDTO: CheckEmailDTO!): CheckedEmailDTO!
   checkUniquePhoneNumber(checkPhoneDTO: CheckPhoneDTO!): CheckedPhoneDTO!

@@ -34,7 +34,7 @@ export class User {
 	@Column({ default: 0 })
 	verificationCodeAttempts: number;
 
-	@Column({ nullable: true })
+	@Column()
 	extraTimeout: number;
 
 	@Column({ type: 'timestamp' })
