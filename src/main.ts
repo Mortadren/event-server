@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-const PORT = 3060;
+const PORT = process.env.PORT || 3060;
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
-		cors: true
+		cors: true,
 	});
 	app.setGlobalPrefix('api');
 
