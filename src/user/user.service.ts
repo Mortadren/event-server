@@ -293,7 +293,6 @@ export class UserService {
 		// Проверяем, есть ли юзер в бд, и если есть, то прошло ли 24 часа с момента внесения записи.
 		const unique = !(userWithPhoneNumber && userWithPhoneNumber.verified);
 
-		console.log(userWithPhoneNumber);
 		return { unique, field: formattedNumber };
 	}
 }

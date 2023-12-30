@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+	forwardRef,
+	Inject,
+	Injectable,
+	UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -88,7 +93,6 @@ export class AuthService {
 		loginByPhone: LoginByPhoneUserInput,
 	): Promise<any> {
 		const { phoneNumber, region, password } = loginByPhone;
-		console.log(this.userService.findUserByPhoneNumber);
 		const user = await this.userService.findUserByPhoneNumber(
 			phoneNumber,
 			region,
