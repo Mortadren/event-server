@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { PhoneNumberStrategy } from './phoneNumber.strategy';
+import { RefreshTokenService } from './refreshToken.service';
 
 @Module({
 	imports: [
@@ -25,6 +26,14 @@ import { PhoneNumberStrategy } from './phoneNumber.strategy';
 			inject: [ConfigService],
 		}),
 	],
-	providers: [AuthService, AuthResolver, LocalStrategy, JwtStrategy, PhoneNumberStrategy],
+	providers: [
+		AuthService,
+		AuthResolver,
+		LocalStrategy,
+		JwtStrategy,
+		PhoneNumberStrategy,
+		RefreshTokenService,
+	],
+	exports: [RefreshTokenService],
 })
 export class AuthModule {}

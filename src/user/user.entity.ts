@@ -16,6 +16,9 @@ export class User {
 	@Field()
 	email: string;
 
+	@Column({ nullable: true })
+	refreshToken: string;
+
 	@Column({ select: true })
 	password: string;
 
@@ -31,7 +34,7 @@ export class User {
 	@Column({ default: 0 })
 	verificationCodeAttempts: number;
 
-	@Column({ nullable: true })
+	@Column()
 	extraTimeout: number;
 
 	@Column({ type: 'timestamp' })

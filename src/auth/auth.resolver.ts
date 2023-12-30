@@ -2,7 +2,12 @@ import { Mutation, Resolver, Args, Context } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './dto/login-response';
 import { LoginUserInput } from './dto/login-user.input';
-import { UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+	UnauthorizedException,
+	UseGuards,
+	UsePipes,
+	ValidationPipe,
+} from '@nestjs/common';
 import { GqlAuthGuard } from './gql-auth.guard';
 import { LoginByPhoneUserInput } from './dto/loginByPhone-user.input';
 
@@ -23,13 +28,14 @@ export class AuthResolver {
 	@Mutation(() => LoginResponse)
 	@UsePipes(new ValidationPipe({ whitelist: true }))
 	async loginWithPhone(
-		@Args('loginByPhoneUserInput', {type: () => LoginByPhoneUserInput}) loginByPhone: LoginByPhoneUserInput,
+		@Args('loginByPhoneUserInput', { type: () => LoginByPhoneUserInput })
+		loginByPhone: LoginByPhoneUserInput,
 	): Promise<LoginResponse> {
-		const user = await this.authService.validateUserViaPhoneNumber(loginByPhone);
+		const user =
+			await this.authService.validateUserViaPhoneNumber(loginByPhone);
 		if (!user) {
 			throw new UnauthorizedException();
 		}
 		return this.authService.login(user);
 	}
-
 }

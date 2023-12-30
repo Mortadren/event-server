@@ -1,7 +1,7 @@
 const errorStartPhrase = 'Error:';
 
-const errorCreator = (message: string) => {
-	return `${errorStartPhrase} ${message}`;
+const errorCreator = (message: string, index: number) => {
+	return `${errorStartPhrase} -0${index}- ${message}`;
 };
 
 const errorMessages = {
@@ -19,8 +19,8 @@ const errorMessages = {
 };
 
 export const errorsConfig = Object.fromEntries(
-	Object.entries(errorMessages).map(([key, value]) => [
+	Object.entries(errorMessages).map(([key, value], index) => [
 		key,
-		errorCreator(value),
+		errorCreator(value, index),
 	]),
 );
